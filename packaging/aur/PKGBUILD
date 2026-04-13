@@ -1,0 +1,65 @@
+# Maintainer: Dirt-Ronin <dirtronin@outlook.com>
+pkgname=lightdeck
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="System monitoring & LED control for Linux. Zero telemetry. Full sarcasm."
+arch=('any')
+url="https://github.com/Dirt-Ronin/lightdeck"
+license=('custom:PolyForm-Noncommercial')
+depends=('python' 'python-pyqt6' 'python-psutil')
+optdepends=(
+    'openrgb: RGB device control (1000+ devices)'
+    'python-pynvml: faster NVIDIA GPU monitoring'
+    'liquidctl: NZXT/Corsair AIO cooler control'
+    'lm_sensors: hardware temperature sensors'
+)
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/Dirt-Ronin/lightdeck/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+    cd "${srcdir}/${pkgname}-${pkgver}"
+
+    # Install app files
+    install -d "${pkgdir}/usr/share/${pkgname}"
+    cp -r *.py drivers/ "${pkgdir}/usr/share/${pkgname}/"
+    install -Dm644 icon.svg "${pkgdir}/usr/share/${pkgname}/icon.svg"
+
+    # Launcher
+    install -d "${pkgdir}/usr/bin"
+    cat > "${pkgdir}/usr/bin/${pkgname}" << EOF
+#!/bin/bash
+exec python3 /usr/share/${pkgname}/main.py "\$@"
+EOF
+    chmod 755 "${pkgdir}/usr/bin/${pkgname}"
+
+    # Desktop entry
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/applications/${pkgname}.desktop" << EOF
+[Desktop Entry]
+Name=LightDeck
+Comment=System monitoring & LED control
+Exec=lightdeck
+Icon=lightdeck
+Terminal=false
+Type=Application
+Categories=Utility;System;
+EOF
+
+    # Icon
+    install -Dm644 icon.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+
+    # License
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    # udev rules
+    install -Dm644 /dev/stdin "${pkgdir}/usr/lib/udev/rules.d/99-${pkgname}.rules" << EOF
+# LightDeck USB device access
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1038", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="04b4", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="187c", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1e71", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1b1c", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1532", GROUP="users", MODE="0660", TAG+="uaccess"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0b05", GROUP="users", MODE="0660", TAG+="uaccess"
+EOF
+}
