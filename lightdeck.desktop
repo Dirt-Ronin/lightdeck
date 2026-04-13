@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=LightDeck
+Comment=System monitoring & LED control
+Exec=bash /home/dirtronin/lightdeck/lightdeck.sh
+Icon=/home/dirtronin/lightdeck/icon.svg
+Terminal=false
+Type=Application
+Categories=Utility;System;HardwareSettings;
+Keywords=rgb;led;lighting;temperature;fan;monitor;cooling;
+StartupNotify=true
