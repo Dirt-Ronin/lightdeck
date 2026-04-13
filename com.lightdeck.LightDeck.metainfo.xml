@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.lightdeck.LightDeck</id>
+  <name>LightDeck</name>
+  <summary>System monitoring and LED control for Linux</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary=https://github.com/Dirt-Ronin/lightdeck/blob/main/LICENSE</project_license>
+  <developer id="com.lightdeck">
+    <name>LightDeck Contributors</name>
+  </developer>
+  <description>
+    <p>LightDeck is a system monitoring and RGB LED control application for Linux.
+    It provides real-time hardware monitoring with gradient-arc gauge dials,
+    Grafana-style sparkline graphs, a transparent gaming overlay, and desktop widgets.</p>
+    <p>Features:</p>
+    <ul>
+      <li>21 hardware sensors — CPU, GPU, fans, thermals, RAM, NVMe, battery, network</li>
+      <li>Auto-detects your hardware and tunes thresholds (AMD Ryzen, Intel, NVIDIA, AMD GPU)</li>
+      <li>39 LED effect presets from 12 ecosystems (OpenRGB, Hue, Chroma, iCUE, Aura, and more)</li>
+      <li>Gaming overlay — transparent HUD with configurable opacity and stats</li>
+      <li>Desktop widgets — floating sensor containers, resizable, auto-reshaping</li>
+      <li>Plugin driver system for community hardware support</li>
+      <li>Zero telemetry. Zero phone-home. Full sarcasm.</li>
+    </ul>
+  </description>
+  <url type="homepage">https://github.com/Dirt-Ronin/lightdeck</url>
+  <url type="bugtracker">https://github.com/Dirt-Ronin/lightdeck/issues</url>
+  <url type="vcs-browser">https://github.com/Dirt-Ronin/lightdeck</url>
+  <launchable type="desktop-id">com.lightdeck.LightDeck.desktop</launchable>
+  <provides>
+    <binary>lightdeck</binary>
+  </provides>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.0.0" date="2026-04-13">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Utility</category>
+    <category>System</category>
+    <category>HardwareSettings</category>
+  </categories>
+  <keywords>
+    <keyword>rgb</keyword>
+    <keyword>led</keyword>
+    <keyword>monitoring</keyword>
+    <keyword>temperature</keyword>
+    <keyword>gpu</keyword>
+    <keyword>cpu</keyword>
+    <keyword>fan</keyword>
+    <keyword>gaming</keyword>
+    <keyword>overlay</keyword>
+  </keywords>
+</component>
