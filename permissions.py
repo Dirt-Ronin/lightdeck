@@ -163,11 +163,20 @@ def check_permissions() -> list[PermissionCheck]:
     # === KERNEL MODULES ===
 
     # msi-ec
+    # The module ships on every Fedora/Nobara x86_64 kernel but only binds on
+    # MSI laptops (its DMI alias is svn*Micro-StarInternational*). Treat it as
+    # "available" only when both the .ko file is present AND the DMI vendor is
+    # MSI — otherwise writing /etc/modules-load.d/lightdeck.conf would cause
+    # systemd-modules-load.service to fail every boot.
     msi_ec_loaded = Path("/sys/devices/platform/msi-ec").exists()
     msi_ec_available = False
     mod_path = Path(f"/lib/modules/{os.uname().release}/kernel/drivers/platform/x86/")
-    if mod_path.exists():
-        msi_ec_available = any(mod_path.glob("msi-ec.*"))
+    if mod_path.exists() and any(mod_path.glob("msi-ec.*")):
+        try:
+            vendor = Path("/sys/devices/virtual/dmi/id/sys_vendor").read_text().strip()
+            msi_ec_available = "micro-star" in vendor.lower()
+        except OSError:
+            msi_ec_available = False
     checks.append(PermissionCheck(
         name="mod_msi_ec",
         label="MSI laptop controls",
@@ -269,9 +278,16 @@ def run_setup(checks: list[PermissionCheck] | None = None) -> tuple[bool, str]:
     # Kernel modules
     for check in needed:
         if check.name == "mod_msi_ec":
+            # Only persist the autoload entry if modprobe actually succeeds.
+            # The previous '|| true' swallowed failures and then unconditionally
+            # added the autoload, causing systemd-modules-load to fail on every
+            # boot on non-MSI hardware.
             script_lines.extend([
-                "modprobe msi-ec 2>/dev/null || true",
-                'grep -q "msi-ec" /etc/modules-load.d/lightdeck.conf 2>/dev/null || echo "msi-ec" >> /etc/modules-load.d/lightdeck.conf',
+                "if modprobe msi-ec 2>/dev/null; then",
+                '  grep -q "msi-ec" /etc/modules-load.d/lightdeck.conf 2>/dev/null || echo "msi-ec" >> /etc/modules-load.d/lightdeck.conf',
+                "else",
+                '  echo "msi-ec not supported on this hardware — autoload entry not added."',
+                "fi",
                 "",
             ])
         elif check.name == "mod_i2c":

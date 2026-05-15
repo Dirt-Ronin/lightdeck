@@ -54,9 +54,16 @@ echo "  Done. LightDeck should appear in your app launcher."
 # 3. Load MSI EC module (for fan/performance mode control on MSI laptops)
 echo "[3/6] Loading MSI EC module..."
 if [ -f "/lib/modules/$(uname -r)/kernel/drivers/platform/x86/msi-ec.ko.zst" ]; then
-    modprobe msi-ec 2>/dev/null && echo "  msi-ec loaded." || echo "  msi-ec failed (your EC firmware may not be supported yet)."
-    # Persist across reboots
-    echo "msi-ec" > /etc/modules-load.d/lightdeck-msi.conf 2>/dev/null
+    # Only persist the autoload entry if the module actually binds. The module
+    # ships on every x86_64 kernel but only loads on MSI hardware — writing
+    # the autoload unconditionally caused systemd-modules-load.service to fail
+    # every boot on non-MSI machines.
+    if modprobe msi-ec 2>/dev/null; then
+        echo "  msi-ec loaded."
+        echo "msi-ec" > /etc/modules-load.d/lightdeck-msi.conf 2>/dev/null
+    else
+        echo "  msi-ec not supported on this hardware — skipping autoload."
+    fi
 else
     echo "  msi-ec module not available on this kernel."
 fi
